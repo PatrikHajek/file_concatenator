@@ -29,6 +29,6 @@ def read_files(path: os.Path): Option[List[File]] =
       ).toOption
     case os.FileType.Dir =>
       Try(
-        os.list(path).map(path => File(path, body = os.read(path))).toList
+        os.list(path).flatMap(read_files).flatten.toList
       ).toOption
     case os.FileType.Other => None
