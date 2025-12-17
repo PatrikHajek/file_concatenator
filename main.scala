@@ -8,6 +8,8 @@ case class File(path: os.Path, body: String)
 
 // TODO: Option for prefix before the file name to easily make it a comment.
 // TODO: Add flags.
+// TODO: Glob ignore pattern. Maybe even a default ignore pattern for things like
+// binary files and images.
 
 @main
 def main(path: String): Unit =
