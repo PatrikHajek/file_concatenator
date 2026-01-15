@@ -24,13 +24,15 @@ def main(paths: String*): Unit =
     })
 
 def read_files(path: os.Path): Option[List[File]] =
-  os.stat(path).fileType match
-    case os.FileType.File | os.FileType.SymLink =>
-      Try(
-        File(path, body = os.read(path)).pipe(List(_))
-      ).toOption
-    case os.FileType.Dir =>
-      Try(
-        os.list(path).flatMap(read_files).flatten.toList
-      ).toOption
-    case os.FileType.Other => None
+  Try {
+    os.stat(path).fileType match
+      case os.FileType.File | os.FileType.SymLink =>
+        Try(
+          File(path, body = os.read(path)).pipe(List(_))
+        ).toOption
+      case os.FileType.Dir =>
+        Try(
+          os.list(path).flatMap(read_files).flatten.toList
+        ).toOption
+      case os.FileType.Other => None
+  }.toOption.flatten
