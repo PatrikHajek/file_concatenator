@@ -12,16 +12,16 @@ case class File(path: os.Path, body: String)
 // binary files and images.
 
 @main
-def main(path: String): Unit =
-  val target = os.pwd / os.RelPath(path)
-  read_files(target) match
-    case Some(files) =>
-      files.map(f => {
-        val name = f.path.toString.replaceAll(os.pwd.toString + "/", "")
-        s"""---------- $name ----------
-        |${f.body}""".stripMargin.pipe(println)
-      })
-    case None => println("No content.. something went wrong")
+def main(paths: String*): Unit =
+  paths
+    .flatMap(path => read_files(os.pwd / os.RelPath(path)))
+    .flatten
+    .distinct
+    .foreach(file => {
+      val name = file.path.toString.replaceAll(os.pwd.toString + "/", "")
+      s"""---------- $name ----------
+        |${file.body}""".stripMargin.pipe(println)
+    })
 
 def read_files(path: os.Path): Option[List[File]] =
   os.stat(path).fileType match
