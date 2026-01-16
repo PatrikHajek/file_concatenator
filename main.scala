@@ -3,6 +3,8 @@
 
 import scala.util.Try
 import scala.util.chaining._
+import scala.util.Failure
+import scala.util.Success
 
 case class File(path: os.Path, body: String)
 
@@ -14,21 +16,26 @@ case class File(path: os.Path, body: String)
 @main
 def main(paths: String*): Unit =
   paths
-    .flatMap(path => read_files(os.pwd / os.RelPath(path)))
-    .flatten
+    .map(path => read_files(os.pwd / os.RelPath(path)))
+    .flatMap(_ match
+      case Failure(e)     => List(e)
+      case Success(files) => files)
     .distinct
-    .foreach(file => {
-      val name = file.path.toString.replaceAll(os.pwd.toString + "/", "")
-      s"""---------- $name ----------
-        |${file.body}""".stripMargin.pipe(println)
-    })
+    .map(_ match
+      case e: Throwable     => e.toString
+      case File(path, body) => {
+        val name = path.toString.replaceAll(os.pwd.toString + "/", "")
+        s"""---------- $name ----------
+        |${body}""".stripMargin
+      })
+    .foreach(println)
 
-def read_files(path: os.Path): Option[List[File]] =
+def read_files(path: os.Path): Try[List[File]] =
   Try {
     os.stat(path).fileType match
       case os.FileType.File | os.FileType.SymLink =>
         File(path, body = os.read(path)).pipe(List(_))
       case os.FileType.Dir =>
-        os.list(path).flatMap(read_files).flatten.toList
+        os.list(path).flatMap(read_files(_).get).toList
       case os.FileType.Other => List()
-  }.toOption
+  }
