@@ -21,6 +21,7 @@ def main(paths: String*): Unit =
       case Failure(e)     => List(e)
       case Success(files) => files)
     .distinct
+    .sortWith((a, b) => a.isInstanceOf[Throwable])
     .map(_ match
       case e: Throwable     => e.toString
       case File(path, body) => {
