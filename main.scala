@@ -26,16 +26,18 @@ def main(paths: String*): Unit =
       case e: Throwable     => e.toString
       case File(path, body) => {
         val name = path.toString.replaceAll(os.pwd.toString + "/", "")
-        s"""---------- $name ----------
+        s"""
+        |---------- $name ----------
         |${body}""".stripMargin
       })
-    .foreach(println)
+    .reduce(_ + "\n" + _)
+    .pipe(println)
 
 def read_files(path: os.Path): Try[List[File]] =
   Try {
     os.stat(path).fileType match
       case os.FileType.File | os.FileType.SymLink =>
-        File(path, body = os.read(path)).pipe(List(_))
+        File(path, body = os.read(path).trim).pipe(List(_))
       case os.FileType.Dir =>
         os.list(path).flatMap(read_files(_).get).toList
       case os.FileType.Other => List()
