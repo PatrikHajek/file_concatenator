@@ -1,3 +1,4 @@
+#!/usr/bin/env -S scala-cli shebang
 //> using scala 3.7.4
 //> using toolkit default
 
@@ -13,8 +14,9 @@ case class File(path: os.Path, body: String)
 // TODO: Glob ignore pattern. Maybe even a default ignore pattern for things like
 // binary files and images.
 
-@main
-def main(paths: String*): Unit =
+main(args.toSeq)
+
+def main(paths: Seq[String]): Unit =
   paths
     .map(path => read_files(os.pwd / os.RelPath(path)))
     .flatMap(_ match
