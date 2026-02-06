@@ -17,6 +17,10 @@ case class File(path: os.Path, body: String)
 main(args.toSeq)
 
 def main(paths: Seq[String]): Unit =
+  if paths.isEmpty then
+    System.err.println("Missing arguments: <path1>, <path2>, ... ")
+    System.exit(1)
+
   paths
     .map(path => read_files(os.pwd / os.RelPath(path)))
     .flatMap(_ match
