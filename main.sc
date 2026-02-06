@@ -2,17 +2,17 @@
 //> using scala 3.7.4
 //> using toolkit default
 
+// TODO: Option for prefix before the file name to easily make it a comment.
+// TODO: Add flags.
+// TODO: Glob ignore pattern. Maybe even a default ignore pattern for things like
+// binary files and images.
+
 import scala.util.Try
 import scala.util.chaining._
 import scala.util.Failure
 import scala.util.Success
 
 case class File(path: os.Path, body: String)
-
-// TODO: Option for prefix before the file name to easily make it a comment.
-// TODO: Add flags.
-// TODO: Glob ignore pattern. Maybe even a default ignore pattern for things like
-// binary files and images.
 
 main(args.toSeq)
 
